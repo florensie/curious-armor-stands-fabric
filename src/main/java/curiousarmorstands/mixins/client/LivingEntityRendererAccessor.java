@@ -1,4 +1,4 @@
-package curiousarmorstands.mixins;
+package curiousarmorstands.mixins.client;
 
 import net.minecraft.client.render.entity.LivingEntityRenderer;
 import net.minecraft.client.render.entity.feature.FeatureRenderer;

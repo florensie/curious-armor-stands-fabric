@@ -21,9 +21,6 @@
   "entrypoints": {
     "main": [
       "curiousarmorstands.CuriousArmorStands"
-    ],
-    "client": [
-      "curiousarmorstands.CuriousArmorStandsClient"
     ]
   },
   "mixins": [

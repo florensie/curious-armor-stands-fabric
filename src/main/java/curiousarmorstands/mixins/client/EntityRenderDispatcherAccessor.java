@@ -1,4 +1,4 @@
-package curiousarmorstands.mixins;
+package curiousarmorstands.mixins.client;
 
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.render.entity.EntityRenderer;

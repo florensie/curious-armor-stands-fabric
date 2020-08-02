@@ -44,6 +44,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class CuriousArmorStands implements ModInitializer {
 
+    @SuppressWarnings("unused")
     public static final String MOD_ID = "curious_armor_stands";
 
     @Override
@@ -52,17 +53,6 @@ public class CuriousArmorStands implements ModInitializer {
         EntityComponentCallback.event(ArmorStandEntity.class).register((armorStandEntity, componentContainer) ->
                 componentContainer.put(CuriosComponent.INVENTORY, new ArmorStandCuriosComponent(armorStandEntity)));
     }
-
-/*    @SubscribeEvent
-    public static void onEntityTick(LivingEvent.LivingUpdateEvent event) {
-        if (event.getEntityLiving() instanceof ArmorStandEntity) {
-            CuriosApi.getCuriosHelper().getCuriosHandler((ArmorStandEntity) event.getEntity()).ifPresent(handler -> {
-                if (handler instanceof CurioInventoryComponent) {
-                    ((CurioInventoryComponent) handler).dropInvalidStacks();
-                }
-            });
-        }
-    }*/
 
     public static ActionResult onUseEntity(PlayerEntity player, World world, Hand hand, Entity target, EntityHitResult hitResult) {
         if (!(target instanceof ArmorStandEntity)) {

@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "curious_armor_stands",
+  "version": "${version}",
+
+  "name": "Curious Armor Stands",
+  "description": "Allows armor stands to equip and display curios",
+  "authors": [
+    "ochotonida",
+    "Florens"
+  ],
+  "contact": {
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/curious-armor-stands",
+    "sources": "https://github.com/florensie/curious-armor-stands-fabric",
+    "issues": "https://github.com/florensie/curious-armor-stands-fabric/issues"
+  },
+  "license": "MIT",
+  "icon": "assets/curious_armor_stands/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "curiousarmorstands.CuriousArmorStands"
+    ]
+  },
+
+  "depends": {
+    "fabricloader": ">=0.7.4",
+    "fabric": "*",
+    "minecraft": "1.16.x",
+    "curios": "*"
+  }
+}

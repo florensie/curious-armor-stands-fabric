@@ -21,8 +21,14 @@
   "entrypoints": {
     "main": [
       "curiousarmorstands.CuriousArmorStands"
+    ],
+    "client": [
+      "curiousarmorstands.CuriousArmorStandsClient"
     ]
   },
+  "mixins": [
+    "curiousarmorstands.mixins.json"
+  ],
 
   "depends": {
     "fabricloader": ">=0.7.4",

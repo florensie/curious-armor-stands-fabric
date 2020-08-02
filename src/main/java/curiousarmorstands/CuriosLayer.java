@@ -9,12 +9,8 @@ import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
-
-import javax.annotation.Nonnull;
 
 @Environment(EnvType.CLIENT)
 public class CuriosLayer<T extends LivingEntity, M extends EntityModel<T>> extends FeatureRenderer<T, M> {

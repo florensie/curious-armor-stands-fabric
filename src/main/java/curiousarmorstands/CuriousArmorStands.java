@@ -1,5 +1,6 @@
 package curiousarmorstands;
 
+import net.fabricmc.api.ModInitializer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.entity.ArmorStandEntityRenderer;
 import net.minecraft.client.render.entity.EntityRenderer;
@@ -12,40 +13,22 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.Vec3d;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.CuriosCapability;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
 import java.util.Map;
 import java.util.Set;
 
-@Mod("curious_armor_stands")
-@SuppressWarnings("unused")
-public class CuriousArmorStands {
+public class CuriousArmorStands implements ModInitializer {
 
-    public static final String MODID = "curious_armor_stands";
+    public static final String MOD_ID = "curious_armor_stands";
 
-    @Mod.EventBusSubscriber(value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
-    public static class RegistryEvents {
+    @Override
+    public void onInitialize() {
 
-        @SubscribeEvent
-        public static void onClientSetup(FMLClientSetupEvent event) {
-            EntityRenderer<?> renderer = MinecraftClient.getInstance().getEntityRenderManager().renderers.get(EntityType.ARMOR_STAND);
-            if (renderer instanceof ArmorStandEntityRenderer) {
-                ((ArmorStandEntityRenderer) renderer).addFeature(new CuriosLayer<>((ArmorStandEntityRenderer) renderer));
-            }
-        }
     }
 
-    @Mod.EventBusSubscriber(modid = CuriousArmorStands.MODID)
     public static class Events {
 
         @SubscribeEvent
@@ -104,7 +87,7 @@ public class CuriousArmorStands {
                         event.setCanceled(true);
                     }
                 }));
-            } else if (canUnEquipCurio(event.getLocalPos(), entity)){
+            } else if (canUnequipCurio(event.getLocalPos(), entity)){
                 CuriosApi.getCuriosHelper().getCuriosHandler(entity).ifPresent(handler -> {
                     Map<String, ICurioStacksHandler> curios = handler.getCurios();
                     for (Map.Entry<String, ICurioStacksHandler> entry : curios.entrySet()) {
@@ -136,7 +119,7 @@ public class CuriousArmorStands {
             }
         }
 
-        private static boolean canUnEquipCurio(Vec3d localPos, ArmorStandEntity entity) {
+        private static boolean canUnequipCurio(Vec3d localPos, ArmorStandEntity entity) {
             boolean isSmall = entity.isSmall();
             double y = isSmall ? localPos.y * 2 : localPos.y;
             return !(entity.hasStackEquipped(EquipmentSlot.FEET) && y >= 0.1 && y < 0.1 + (isSmall ? 0.8 : 0.45))

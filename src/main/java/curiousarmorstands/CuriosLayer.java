@@ -20,28 +20,26 @@ public class CuriosLayer<T extends LivingEntity, M extends EntityModel<T>> exten
     }
 
     @Override
-    public void render(@Nonnull MatrixStack matrixStack, @Nonnull VertexConsumerProvider renderTypeBuffer, int light, @Nonnull T livingEntity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
+    public void render(MatrixStack matrixStack, VertexConsumerProvider renderTypeBuffer, int light, T livingEntity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         matrixStack.push();
         CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).ifPresent(handler -> handler.getCurios().forEach((id, stacksHandler) -> {
             IDynamicStackHandler stackHandler = stacksHandler.getStacks();
             IDynamicStackHandler cosmeticStacksHandler = stacksHandler.getCosmeticStacks();
 
-            for (int i = 0; i < stackHandler.getSlots(); i++) {
-                ItemStack stack = cosmeticStacksHandler.getStackInSlot(i);
+            for (int i = 0; i < stackHandler.size(); i++) {
+                ItemStack stack = cosmeticStacksHandler.getStack(i);
 
                 if (stack.isEmpty() && stacksHandler.getRenders().get(i)) {
-                    stack = stackHandler.getStackInSlot(i);
+                    stack = stackHandler.getStack(i);
                 }
 
                 if (!stack.isEmpty()) {
                     int index = i;
 
-                    CuriosApi.getCuriosHelper().getCurio(stack).ifPresent(curio -> {
-                        if (curio.canRender(id, index, livingEntity)) {
-                            matrixStack.push();
-                            curio.render(id, index, matrixStack, renderTypeBuffer, light, livingEntity, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch);
-                            matrixStack.pop();
-                        }
+                    CuriosApi.getCuriosHelper().getRenderableCurio(stack).ifPresent(curio -> {
+                        matrixStack.push();
+                        curio.render(id, index, matrixStack, renderTypeBuffer, light, livingEntity, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch);
+                        matrixStack.pop();
                     });
                 }
             }

@@ -1,5 +1,6 @@
 package curiousarmorstands;
 
+import nerdhub.cardinal.components.api.event.EntityComponentCallback;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.minecraft.entity.Entity;
@@ -16,6 +17,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.CuriosComponent;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
@@ -30,6 +32,9 @@ public class CuriousArmorStands implements ModInitializer {
     @Override
     public void onInitialize() {
         UseEntityCallback.EVENT.register(CuriousArmorStands::onUseEntity);
+        EntityComponentCallback.event(ArmorStandEntity.class).register((armorStandEntity, componentContainer) -> {
+            componentContainer.put(CuriosComponent.INVENTORY, new CurioInventoryComponent(armorStandEntity));
+        });
     }
 
     @SubscribeEvent
@@ -40,13 +45,6 @@ public class CuriousArmorStands implements ModInitializer {
                     ((CurioInventoryComponent) handler).dropInvalidStacks();
                 }
             });
-        }
-    }
-
-    @SubscribeEvent
-    public static void attachEntitiesCapabilities(AttachCapabilitiesEvent<Entity> event) {
-        if (event.getObject() instanceof ArmorStandEntity) {
-            event.addCapability(CuriosCapability.ID_INVENTORY, CurioInventoryCapability((ArmorStandEntity) event.getObject()));
         }
     }
 

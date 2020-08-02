@@ -1,11 +1,7 @@
 package curiousarmorstands;
 
 import net.fabricmc.api.ModInitializer;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.entity.ArmorStandEntityRenderer;
-import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.item.Item;
@@ -35,8 +31,8 @@ public class CuriousArmorStands implements ModInitializer {
         public static void onEntityTick(LivingEvent.LivingUpdateEvent event) {
             if (event.getEntityLiving() instanceof ArmorStandEntity) {
                 CuriosApi.getCuriosHelper().getCuriosHandler((ArmorStandEntity) event.getEntity()).ifPresent(handler -> {
-                    if (handler instanceof CurioInventoryCapability.CurioInventoryWrapper) {
-                        ((CurioInventoryCapability.CurioInventoryWrapper) handler).dropInvalidStacks();
+                    if (handler instanceof CurioInventoryComponent) {
+                        ((CurioInventoryComponent) handler).dropInvalidStacks();
                     }
                 });
             }
@@ -45,7 +41,7 @@ public class CuriousArmorStands implements ModInitializer {
         @SubscribeEvent
         public static void attachEntitiesCapabilities(AttachCapabilitiesEvent<Entity> event) {
             if (event.getObject() instanceof ArmorStandEntity) {
-                event.addCapability(CuriosCapability.ID_INVENTORY, CurioInventoryCapability.createProvider((ArmorStandEntity) event.getObject()));
+                event.addCapability(CuriosCapability.ID_INVENTORY, CurioInventoryCapability((ArmorStandEntity) event.getObject()));
             }
         }
 
@@ -64,12 +60,12 @@ public class CuriousArmorStands implements ModInitializer {
                         Map<String, ICurioStacksHandler> curios = handler.getCurios();
                         for (Map.Entry<String, ICurioStacksHandler> entry : curios.entrySet()) {
                             IDynamicStackHandler stackHandler = entry.getValue().getCosmeticStacks();
-                            for (int i = 0; i < stackHandler.getSlots(); i++) {
-                                ItemStack present = stackHandler.getStackInSlot(i);
+                            for (int i = 0; i < stackHandler.size(); i++) {
+                                ItemStack present = stackHandler.getStack(i);
                                 Set<String> tags = CuriosApi.getCuriosHelper().getCurioTags(stack.getItem());
                                 String id = entry.getKey();
                                 if (present.isEmpty() && (tags.contains(id) || tags.contains("curio")) && curio.canEquip(id, entity)) {
-                                    stackHandler.setStackInSlot(i, stack.copy());
+                                    stackHandler.setStack(i, stack.copy());
                                     curio.playRightClickEquipSound(entity);
                                     enableArmorStandArms(entity, item);
                                     if (!event.getPlayer().isCreative()) {
@@ -92,14 +88,14 @@ public class CuriousArmorStands implements ModInitializer {
                     Map<String, ICurioStacksHandler> curios = handler.getCurios();
                     for (Map.Entry<String, ICurioStacksHandler> entry : curios.entrySet()) {
                         IDynamicStackHandler stackHandler = entry.getValue().getCosmeticStacks();
-                        for (int i = 0; i < stackHandler.getSlots(); i++) {
-                            ItemStack present = stackHandler.getStackInSlot(i);
+                        for (int i = 0; i < stackHandler.size(); i++) {
+                            ItemStack present = stackHandler.getStack(i);
                             Set<String> tags = CuriosApi.getCuriosHelper().getCurioTags(stack.getItem());
                             String id = entry.getKey();
                             if (!present.isEmpty()) {
                                 if (!entity.world.isClient()) {
                                     event.getPlayer().setStackInHand(event.getHand(), present);
-                                    stackHandler.setStackInSlot(i, ItemStack.EMPTY);
+                                    stackHandler.setStack(i, ItemStack.EMPTY);
                                 }
                                 event.setCancellationResult(ActionResult.SUCCESS);
                                 event.setCanceled(true);

@@ -15,13 +15,13 @@ import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
 import java.util.*;
 
-public class CurioInventoryComponent implements ICuriosItemHandler {
+public class ArmorStandCuriosComponent implements ICuriosItemHandler {
 
     Map<String, ICurioStacksHandler> curios = new LinkedHashMap<>();
     DefaultedList<ItemStack> invalidStacks = DefaultedList.of();
     LivingEntity wearer;
 
-    CurioInventoryComponent(LivingEntity entity) {
+    ArmorStandCuriosComponent(LivingEntity entity) {
         wearer = entity;
         reset();
     }

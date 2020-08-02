@@ -7,27 +7,27 @@ import net.minecraft.client.render.entity.feature.FeatureRenderer;
 import net.minecraft.client.render.entity.feature.FeatureRendererContext;
 import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.item.ItemStack;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
 @Environment(EnvType.CLIENT)
-public class CuriosLayer<T extends LivingEntity, M extends EntityModel<T>> extends FeatureRenderer<T, M> {
+public class ArmorStandCuriosFeatureRenderer<M extends EntityModel<ArmorStandEntity>> extends FeatureRenderer<ArmorStandEntity, M> {
 
-    public CuriosLayer(FeatureRendererContext<T, M> renderer) {
-        super(renderer);
+    public ArmorStandCuriosFeatureRenderer(FeatureRendererContext<ArmorStandEntity, M> context) {
+        super(context);
     }
 
     @Override
-    public void render(MatrixStack matrixStack, VertexConsumerProvider renderTypeBuffer, int light, T livingEntity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
+    public void render(MatrixStack matrixStack, VertexConsumerProvider vertexConsumers, int light, ArmorStandEntity armorStandEntity, float limbAngle, float limbDistance, float tickDelta, float animationProgress, float headYaw, float headPitch) {
         matrixStack.push();
-        CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).ifPresent(handler -> handler.getCurios().forEach((id, stacksHandler) -> {
+        CuriosApi.getCuriosHelper().getCuriosHandler(armorStandEntity).ifPresent(handler -> handler.getCurios().forEach((id, stacksHandler) -> {
             IDynamicStackHandler stackHandler = stacksHandler.getStacks();
-            IDynamicStackHandler cosmeticStacksHandler = stacksHandler.getCosmeticStacks();
+            IDynamicStackHandler cosmeticStackHandler = stacksHandler.getCosmeticStacks();
 
             for (int i = 0; i < stackHandler.size(); i++) {
-                ItemStack stack = cosmeticStacksHandler.getStack(i);
+                ItemStack stack = cosmeticStackHandler.getStack(i);
 
                 if (stack.isEmpty() && stacksHandler.getRenders().get(i)) {
                     stack = stackHandler.getStack(i);
@@ -38,7 +38,7 @@ public class CuriosLayer<T extends LivingEntity, M extends EntityModel<T>> exten
 
                     CuriosApi.getCuriosHelper().getRenderableCurio(stack).ifPresent(curio -> {
                         matrixStack.push();
-                        curio.render(id, index, matrixStack, renderTypeBuffer, light, livingEntity, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch);
+                        curio.render(id, index, matrixStack, vertexConsumers, light, armorStandEntity, limbAngle, limbDistance, tickDelta, animationProgress, headYaw, headPitch);
                         matrixStack.pop();
                     });
                 }

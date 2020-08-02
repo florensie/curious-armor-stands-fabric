@@ -95,12 +95,10 @@ public class ArmorStandCuriosComponent implements ICuriosItemHandler {
     }
 
     @Override
-    public void handleInvalidStacks() { }
-
-    public void dropInvalidStacks() {
-        if (wearer != null && !invalidStacks.isEmpty()) {
-            invalidStacks.forEach(drop -> dropStack(wearer, drop));
-            invalidStacks = DefaultedList.of();
+    public void handleInvalidStacks() {
+        if (this.wearer != null && !this.invalidStacks.isEmpty()) {
+            this.invalidStacks.forEach(drop -> dropStack(wearer, drop));
+            this.invalidStacks = DefaultedList.of();
         }
     }
 

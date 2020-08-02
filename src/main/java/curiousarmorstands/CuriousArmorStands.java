@@ -33,11 +33,11 @@ public class CuriousArmorStands implements ModInitializer {
     public void onInitialize() {
         UseEntityCallback.EVENT.register(CuriousArmorStands::onUseEntity);
         EntityComponentCallback.event(ArmorStandEntity.class).register((armorStandEntity, componentContainer) -> {
-            componentContainer.put(CuriosComponent.INVENTORY, new CurioInventoryComponent(armorStandEntity));
+            componentContainer.put(CuriosComponent.INVENTORY, new ArmorStandCuriosComponent(armorStandEntity));
         });
     }
 
-    @SubscribeEvent
+/*    @SubscribeEvent
     public static void onEntityTick(LivingEvent.LivingUpdateEvent event) {
         if (event.getEntityLiving() instanceof ArmorStandEntity) {
             CuriosApi.getCuriosHelper().getCuriosHandler((ArmorStandEntity) event.getEntity()).ifPresent(handler -> {
@@ -46,7 +46,7 @@ public class CuriousArmorStands implements ModInitializer {
                 }
             });
         }
-    }
+    }*/
 
     public static ActionResult onUseEntity(PlayerEntity player, World world, Hand hand, Entity target, EntityHitResult hitResult) {
         if (!(target instanceof ArmorStandEntity)) {

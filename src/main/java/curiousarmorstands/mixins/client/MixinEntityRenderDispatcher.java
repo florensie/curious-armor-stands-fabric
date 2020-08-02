@@ -17,7 +17,7 @@
 
 package curiousarmorstands.mixins.client;
 
-import curiousarmorstands.ArmorStandCuriosFeatureRenderer;
+import curiousarmorstands.client.ArmorStandCuriosFeatureRenderer;
 import net.minecraft.client.render.entity.ArmorStandEntityRenderer;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.render.entity.EntityRenderer;

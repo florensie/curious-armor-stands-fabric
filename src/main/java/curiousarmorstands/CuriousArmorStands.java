@@ -88,11 +88,13 @@ public class CuriousArmorStands implements ModInitializer {
                                 }
 
                                 isSuccess.set(ActionResult.SUCCESS);
+                                return;
                             }
                         }
                     }
                 } else {
-                    isSuccess.set(ActionResult.CONSUME);
+                    // TODO: this is CONSUME in the Forge version
+                    isSuccess.set(ActionResult.SUCCESS);
                 }
             }));
         } else if (canUnequipCurio(hitResult, entity)) { // Unequip curios with empty hand
@@ -112,6 +114,7 @@ public class CuriousArmorStands implements ModInitializer {
                                 stackHandler.setStack(i, ItemStack.EMPTY);
                             }
                             isSuccess.set(ActionResult.SUCCESS);
+                            return;
                         }
                     }
                 }
@@ -120,6 +123,11 @@ public class CuriousArmorStands implements ModInitializer {
         return isSuccess.get();
     }
 
+    /**
+     * Enables arms on an armor stand if a curio attaches to it (hands, ring or bracelet)
+     * @param entity the armor stand to enable arms for
+     * @param curioItem the item that was equiped
+     */
     private static void enableArmorStandArms(ArmorStandEntity entity, Item curioItem) {
         if (CuriosApi.getCuriosHelper().getCurioTags(curioItem).contains("hands") || CuriosApi.getCuriosHelper().getCurioTags(curioItem).contains("ring") || CuriosApi.getCuriosHelper().getCurioTags(curioItem).contains("bracelet")) {
             CompoundTag compoundTag = entity.toTag(new CompoundTag());
@@ -128,6 +136,12 @@ public class CuriousArmorStands implements ModInitializer {
         }
     }
 
+    /**
+     * Checks whether the armor stand has any unequipable armor (at the targetted position)
+     * @param hitResult the hit result from using an item on an armor stand
+     * @param entity the targetted armor stand
+     * @return whether or not a curio can be unequiped from the armor stand
+     */
     private static boolean canUnequipCurio(HitResult hitResult, ArmorStandEntity entity) {
         boolean isSmall = entity.isSmall();
         Vec3d localPos = hitResult.getPos().subtract(entity.getPos());

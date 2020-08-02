@@ -1,29 +1,21 @@
 package curiousarmorstands;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.math.Direction;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.capabilities.ICapabilitySerializable;
-import net.minecraftforge.common.util.LazyOptional;
+import org.jetbrains.annotations.NotNull;
 import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.CuriosCapability;
-import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
+import top.theillusivec4.curios.api.CuriosComponent;
+import top.theillusivec4.curios.api.type.component.ICuriosItemHandler;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
-import javax.annotation.Nonnull;
 import java.util.*;
 
 public class CurioInventoryCapability {
-
-    public static ICapabilityProvider createProvider(LivingEntity entity) {
-        return new Provider(entity);
-    }
 
     public static class CurioInventoryWrapper implements ICuriosItemHandler {
 
@@ -118,16 +110,16 @@ public class CurioInventoryCapability {
             if (wearer != null && !wearer.getEntityWorld().isClient()) {
                 List<ItemStack> drops = new ArrayList<>();
 
-                for (int i = stackHandler.getSlots() - amount; i < stackHandler.getSlots(); i++) {
-                    ItemStack stack = stackHandler.getStackInSlot(i);
-                    drops.add(stackHandler.getStackInSlot(i));
+                for (int i = stackHandler.size() - amount; i < stackHandler.size(); i++) {
+                    ItemStack stack = stackHandler.getStack(i);
+                    drops.add(stackHandler.getStack(i));
 
                     if (!stack.isEmpty()) {
                         wearer.getAttributes().removeModifiers(CuriosApi.getCuriosHelper().getAttributeModifiers(identifier, stack));
                         int index = i;
                         CuriosApi.getCuriosHelper().getCurio(stack).ifPresent(curio -> curio.onUnequip(identifier, index, wearer));
                     }
-                    stackHandler.setStackInSlot(i, ItemStack.EMPTY);
+                    stackHandler.setStack(i, ItemStack.EMPTY);
                 }
                 drops.forEach(drop -> dropStack(wearer, drop));
             }
@@ -139,32 +131,24 @@ public class CurioInventoryCapability {
                 entity.world.spawnEntity(itemEntity);
             }
         }
-    }
 
-    public static class Provider implements ICapabilitySerializable<Tag> {
-
-        final LazyOptional<ICuriosItemHandler> optional;
-        final ICuriosItemHandler handler;
-
-        Provider(LivingEntity entity) {
-            handler = new CurioInventoryWrapper(entity);
-            optional = LazyOptional.of(() -> handler);
-        }
-
-        @Nonnull
         @Override
-        public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> capability, Direction facing) {
-            return CuriosCapability.INVENTORY.orEmpty(capability, optional);
+        @NotNull
+        public Entity getEntity() {
+            return wearer;
         }
 
         @Override
-        public Tag serializeNBT() {
-            return CuriosCapability.INVENTORY.writeNBT(handler, null);
+        // TODO: Does this work?
+        public void fromTag(CompoundTag compoundTag) {
+            CuriosComponent.INVENTORY.get(this).fromTag(compoundTag);
         }
 
         @Override
-        public void deserializeNBT(Tag nbt) {
-            CuriosCapability.INVENTORY.readNBT(handler, null, nbt);
+        @NotNull
+        // TODO: Does this work?
+        public CompoundTag toTag(CompoundTag compoundTag) {
+            return CuriosComponent.INVENTORY.get(this).toTag(compoundTag);
         }
     }
 }

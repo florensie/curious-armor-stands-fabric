@@ -1,10 +1,12 @@
 package curiousarmorstands;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.entity.IEntityRenderer;
-import net.minecraft.client.renderer.entity.layers.LayerRenderer;
-import net.minecraft.client.renderer.entity.model.EntityModel;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.entity.feature.FeatureRenderer;
+import net.minecraft.client.render.entity.feature.FeatureRendererContext;
+import net.minecraft.client.render.entity.model.EntityModel;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
@@ -14,15 +16,15 @@ import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
 import javax.annotation.Nonnull;
 
-@OnlyIn(Dist.CLIENT)
-public class CuriosLayer<T extends LivingEntity, M extends EntityModel<T>> extends LayerRenderer<T, M> {
+@Environment(EnvType.CLIENT)
+public class CuriosLayer<T extends LivingEntity, M extends EntityModel<T>> extends FeatureRenderer<T, M> {
 
-    public CuriosLayer(IEntityRenderer<T, M> renderer) {
+    public CuriosLayer(FeatureRendererContext<T, M> renderer) {
         super(renderer);
     }
 
     @Override
-    public void render(@Nonnull MatrixStack matrixStack, @Nonnull IRenderTypeBuffer renderTypeBuffer, int light, @Nonnull T livingEntity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
+    public void render(@Nonnull MatrixStack matrixStack, @Nonnull VertexConsumerProvider renderTypeBuffer, int light, @Nonnull T livingEntity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         matrixStack.push();
         CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).ifPresent(handler -> handler.getCurios().forEach((id, stacksHandler) -> {
             IDynamicStackHandler stackHandler = stacksHandler.getStacks();

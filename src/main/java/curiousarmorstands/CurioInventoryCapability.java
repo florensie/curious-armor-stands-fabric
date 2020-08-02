@@ -1,11 +1,11 @@
 package curiousarmorstands;
 
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.INBT;
-import net.minecraft.util.Direction;
-import net.minecraft.util.NonNullList;
+import net.minecraft.nbt.Tag;
+import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.math.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
@@ -28,7 +28,7 @@ public class CurioInventoryCapability {
     public static class CurioInventoryWrapper implements ICuriosItemHandler {
 
         Map<String, ICurioStacksHandler> curios = new LinkedHashMap<>();
-        NonNullList<ItemStack> invalidStacks = NonNullList.create();
+        DefaultedList<ItemStack> invalidStacks = DefaultedList.of();
         LivingEntity wearer;
 
         CurioInventoryWrapper(LivingEntity entity) {
@@ -38,7 +38,7 @@ public class CurioInventoryCapability {
 
         @Override
         public void reset() {
-            if (!wearer.getEntityWorld().isRemote()) {
+            if (!wearer.getEntityWorld().isClient()) {
                 curios.clear();
                 invalidStacks.clear();
                 CuriosApi.getSlotHelper().createSlots().forEach((slotType, stacksHandler) -> curios.put(slotType.getIdentifier(), stacksHandler));
@@ -110,12 +110,12 @@ public class CurioInventoryCapability {
         public void dropInvalidStacks() {
             if (wearer != null && !invalidStacks.isEmpty()) {
                 invalidStacks.forEach(drop -> dropStack(wearer, drop));
-                invalidStacks = NonNullList.create();
+                invalidStacks = DefaultedList.of();
             }
         }
 
         private void loseStacks(IDynamicStackHandler stackHandler, String identifier, int amount) {
-            if (wearer != null && !wearer.getEntityWorld().isRemote()) {
+            if (wearer != null && !wearer.getEntityWorld().isClient()) {
                 List<ItemStack> drops = new ArrayList<>();
 
                 for (int i = stackHandler.getSlots() - amount; i < stackHandler.getSlots(); i++) {
@@ -123,7 +123,7 @@ public class CurioInventoryCapability {
                     drops.add(stackHandler.getStackInSlot(i));
 
                     if (!stack.isEmpty()) {
-                        wearer.func_233645_dx_().func_233785_a_(CuriosApi.getCuriosHelper().getAttributeModifiers(identifier, stack));
+                        wearer.getAttributes().removeModifiers(CuriosApi.getCuriosHelper().getAttributeModifiers(identifier, stack));
                         int index = i;
                         CuriosApi.getCuriosHelper().getCurio(stack).ifPresent(curio -> curio.onUnequip(identifier, index, wearer));
                     }
@@ -134,14 +134,14 @@ public class CurioInventoryCapability {
         }
 
         private void dropStack(LivingEntity entity, ItemStack stack) {
-            if (!entity.world.isRemote) {
-                ItemEntity itemEntity = new ItemEntity(entity.world, entity.getPosX(), entity.getPosY() + 0.5, entity.getPosZ(), stack);
-                entity.world.addEntity(itemEntity);
+            if (!entity.world.isClient) {
+                ItemEntity itemEntity = new ItemEntity(entity.world, entity.getX(), entity.getY() + 0.5, entity.getZ(), stack);
+                entity.world.spawnEntity(itemEntity);
             }
         }
     }
 
-    public static class Provider implements ICapabilitySerializable<INBT> {
+    public static class Provider implements ICapabilitySerializable<Tag> {
 
         final LazyOptional<ICuriosItemHandler> optional;
         final ICuriosItemHandler handler;
@@ -158,12 +158,12 @@ public class CurioInventoryCapability {
         }
 
         @Override
-        public INBT serializeNBT() {
+        public Tag serializeNBT() {
             return CuriosCapability.INVENTORY.writeNBT(handler, null);
         }
 
         @Override
-        public void deserializeNBT(INBT nbt) {
+        public void deserializeNBT(Tag nbt) {
             CuriosCapability.INVENTORY.readNBT(handler, null, nbt);
         }
     }

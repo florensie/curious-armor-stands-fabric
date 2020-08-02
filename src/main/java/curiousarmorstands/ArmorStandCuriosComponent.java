@@ -17,6 +17,7 @@
 
 package curiousarmorstands;
 
+import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
@@ -24,6 +25,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.collection.DefaultedList;
 import org.jetbrains.annotations.NotNull;
 import top.theillusivec4.curios.api.CuriosApi;
@@ -35,6 +37,10 @@ import top.theillusivec4.curios.common.inventory.CurioStacksHandler;
 
 import java.util.*;
 
+/**
+ * Component attached to all armor stands to provide Curio functionality
+ * Most of this came from PlayerCuriosComponent
+ */
 public class ArmorStandCuriosComponent implements ICuriosItemHandler {
 
     Map<String, ICurioStacksHandler> curios = new LinkedHashMap<>();
@@ -148,16 +154,15 @@ public class ArmorStandCuriosComponent implements ICuriosItemHandler {
         }
     }
 
-    @Override
-    @NotNull
+    @Override @NotNull
     public Entity getEntity() {
         return wearer;
     }
 
     @Override
     public void fromTag(CompoundTag compoundTag) {
-        ListTag tagList = compoundTag.getList("Curios", 10);
-        ListTag lockedList = compoundTag.getList("Locked", 8);
+        ListTag tagList = compoundTag.getList("Curios", NbtType.COMPOUND);
+        ListTag lockedList = compoundTag.getList("Locked", NbtType.STRING);
 
         if (!tagList.isEmpty()) {
             Map<String, ICurioStacksHandler> curios = new LinkedHashMap<>();
@@ -227,8 +232,7 @@ public class ArmorStandCuriosComponent implements ICuriosItemHandler {
         }
     }
 
-    @Override
-    @NotNull
+    @Override @NotNull
     public CompoundTag toTag(CompoundTag compoundTag) {
         ListTag taglist = new ListTag();
         this.getCurios().forEach((key, stacksHandler) -> {
@@ -246,5 +250,33 @@ public class ArmorStandCuriosComponent implements ICuriosItemHandler {
         }
         compoundTag.put("Locked", taglist1);
         return compoundTag;
+    }
+
+    @Override
+    public void writeToPacket(PacketByteBuf buf) {
+        buf.writeInt(this.curios.size());
+
+        for (Map.Entry<String, ICurioStacksHandler> entry : this.curios.entrySet()) {
+            buf.writeString(entry.getKey());
+            buf.writeCompoundTag(entry.getValue().serializeTag());
+        }
+    }
+
+    @Override
+    public void readFromPacket(PacketByteBuf buf) {
+        int entrySize = buf.readInt();
+        Map<String, ICurioStacksHandler> map = new LinkedHashMap<>();
+
+        for (int i = 0; i < entrySize; i++) {
+            String key = buf.readString(25);
+            CurioStacksHandler stacksHandler = new CurioStacksHandler();
+            CompoundTag compound = buf.readCompoundTag();
+
+            if (compound != null) {
+                stacksHandler.deserializeTag(compound);
+            }
+            map.put(key, stacksHandler);
+        }
+        this.setCurios(map);
     }
 }

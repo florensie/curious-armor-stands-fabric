@@ -14,7 +14,7 @@
     "sources": "https://github.com/florensie/curious-armor-stands-fabric",
     "issues": "https://github.com/florensie/curious-armor-stands-fabric/issues"
   },
-  "license": "MIT",
+  "license": "LGPL-3.0-or-later",
   "icon": "assets/curious_armor_stands/icon.png",
 
   "environment": "*",

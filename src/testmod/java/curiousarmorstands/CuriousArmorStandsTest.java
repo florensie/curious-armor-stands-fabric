@@ -29,7 +29,9 @@ public class CuriousArmorStandsTest implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        System.out.println("[Curious Armor Stands] Test mod is here!");
+
         // Allows us to check if loseInvalidStack works
-        CuriosApi.enqueueSlotType(SlotTypeInfo.BuildScheme.REGISTER, SlotTypePreset.RING.getInfoBuilder().build());
+        CuriosApi.enqueueSlotType(SlotTypeInfo.BuildScheme.REGISTER, SlotTypePreset.HEAD.getInfoBuilder().size(5).build());
     }
 }
